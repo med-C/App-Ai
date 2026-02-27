@@ -1,0 +1,29 @@
+SDL_Surface → image brute en RAM CPU, modifiable pixel par pixel.
+
+SDL_CreateTextureFromSurface → copie la surface dans la VRAM GPU, devient SDL_Texture.
+
+SDL_Texture → image GPU optimisée, prête à être dessinée plusieurs fois (pixel non modifiable directement, sauf si lock).
+
+Back buffer → zone dans la VRAM où le GPU construit la frame actuelle.
+
+RenderCopy → copie la texture GPU → back buffer GPU.
+
+SDL_RenderClear → vide le back buffer avant de dessiner.
+
+RenderPresent → swap back buffer → front buffer → affichage à l’écran.
+
+Front buffer → zone VRAM visible à l’écran.
+
+CPU → prépare commandes de rendu.
+GPU → exécute les commandes, pas d’écriture directe CPU → écran.
+
+
+
+
+Chaque frame :
+
+SDL_RenderClear() → clear back buffer
+
+RenderCopy toutes les textures → back buffer
+
+RenderPresent() → swap → front buffer → écran

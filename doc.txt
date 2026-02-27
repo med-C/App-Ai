@@ -27,3 +27,38 @@ SDL_RenderClear() → clear back buffer
 RenderCopy toutes les textures → back buffer
 
 RenderPresent() → swap → front buffer → écran
+
+
+
+
+SDL_Window* window = SDL_CreateWindow(...)
+
+Compilation
+
+Le compilateur réserve la place pour le pointeur window sur la pile (stack).
+
+Il ne connaît que le prototype de SDL_CreateWindow, pas le code interne.
+
+Linkage
+
+Le linker relie l’appel à SDL_CreateWindow dans la bibliothèque SDL2.
+
+Résout l’adresse de la fonction dans le binaire final.
+
+Exécution
+
+SDL_CreateWindow() alloue un SDL_Window dans le heap (structure interne avec handles OS, largeur, hauteur, flags…).
+
+L’adresse de cet objet est retournée et stockée dans window sur la pile.
+
+Manipulation
+
+window pointe vers le heap → tu peux l’utiliser via SDL.
+
+Si création échoue → window == nullptr.
+
+Destruction
+
+Appel SDL_DestroyWindow(window) → libère l’objet dans le heap.
+
+Le pointeur window sur la pile reste, mais l’objet réel est libéré.

@@ -1,0 +1,12 @@
+Commande correcte pour MinGW + cpp-httplib + OpenSSL sur Windows
+g++ test.cpp -Iinclude -lssl -lcrypto -lws2_32 -lcrypt32 -lgdi32 -o app.exe
+
+Explications :
+
+-lssl -lcrypto → OpenSSL
+
+-lws2_32 → sockets Windows
+
+-lcrypt32 → certificats Windows / Crypt32 API
+
+-lgdi32 → parfois nécessaire pour certaines fonctions Windows utilisées par SSL (facultatif, mais sûr)

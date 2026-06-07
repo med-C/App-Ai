@@ -18,26 +18,24 @@ The system is designed with a **strict execution pipeline and reproducible envir
 
 ---
 
-## 🎬 Live Demo
-
-> ⚡ Add your best visual here (VERY IMPORTANT SECTION)
-
-### registre Interface
-![Login Screen](https://github.com/med-C/App-Ai/tree/main/other/b.png) 
-
-### 📸 Login Interface
-![Login Screen](https://github.com/med-C/App-Ai/tree/main/other/a.png) <!-- TODO -->
-
-
-### 💬 Chat Interface
-![Chat Screen](https://github.com/med-C/App-Ai/tree/main/other/interface.png) <!-- TODO -->
-![Chat Screen](https://github.com/med-C/App-Ai/tree/main/other/interface2.png) <!-- TODO -->
-
+> ⚡
 
 ### 🎥 Full Demo
-![Demo](https://github.com/med-C/App-Ai/tree/main/other/video.mp4) <!-- TODO -->
+![Demo](https://raw.githubusercontent.com/med-C/App-Ai/main/other/video.mp4)
+
+### registre Interface
+![Register Interface](https://raw.githubusercontent.com/med-C/App-Ai/main/other/b.png)
+
+### 📸 Login Interface
+![Login Screen](https://raw.githubusercontent.com/med-C/App-Ai/main/other/a.png)
+
+### 💬 Chat Interface
+![Chat Screen](https://raw.githubusercontent.com/med-C/App-Ai/main/other/interface.png)
+
+![Chat Screen](https://raw.githubusercontent.com/med-C/App-Ai/main/other/interface2.png)
 
 ---
+
 
 ## ⚙️ System Requirements
 

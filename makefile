@@ -4,22 +4,18 @@ header = -Isdl2/include $(otherh)
 libdir = -Lsdl2/lib
 lib = -lmingw32 -lSDL2main -lSDL2 -lssl -lcrypto -lws2_32 -lcrypt32 -lgdi32
 
+file = test.cpp
+
 otherf = $(wildcard im*.cpp) $(file) backends/imgui_impl_sdl2.cpp backends/imgui_impl_sdlrenderer2.cpp
-file = test.cpp #$(wildcard src/*.cpp) #change de file
-#compile all cpp in src dossier
 
-s: #sdl compil
-	g++ $(otherf) $(header) $(libdir) $(lib) -mwindows -o sdl2/bin/test
+mongoi = -I C:/mongo-cxx-driver/include \
+         -I C:/mongo-cxx-driver/include/mongocxx/v_noabi \
+         -I C:/mongo-cxx-driver/include/bsoncxx/v_noabi
+
+mongol = -L C:/mongo-cxx-driver/lib -lmongocxx -lbsoncxx -lWs2_32 -lcrypt32 -lBcrypt -lSecur32
+
+s:
+	g++ $(otherf) $(header) $(mongoi) $(libdir) $(lib) $(mongol) -mwindows -o sdl2/bin/myapp.exe
+
 os:
-	sdl2/bin/test
-
-
-
-imgui: #imgui compil but not correct we should use header of sdl2 and cpp
-	g++ test.cpp imgui.cpp imgui_draw.cpp imgui_tables.cpp imgui_widgets.cpp -o test_imgui
-oi:
-	test_imgui
-
-
-
-
+	sdl2/bin/myapp.exe

@@ -263,3 +263,78 @@ Ferme ImGui et SDL correctement.
        |
        v
 [Utilisateur voit la réponse et peut taper autre question]
+
+
+object store
+orm
+openai academie 
+huggingface/learn
+n8n
+agent base donne
+
+
+
+developer un uml interessant 
+uml diagramme de class
+
+
+python flask local - cpp httplib question to local host and capt response
+
+[Input C++]
+    │
+    ├─> Vérification/Validation (dans C++)
+    │
+    └─> Envoi des données → Serveur Flask (Python)
+              │
+              ├─> Reçoit JSON via HTTP POST
+              │
+              └─> Traitement avec Python
+                        │
+                        └─> Stockage / Manipulation → MongoDB via PyMongo
+
+
+
+[CPU Core / Cache]
+       │
+       │ Prépare données : positions, couleurs, indices…
+       ▼
+[CPU Buffer en RAM]
+  (tableau pixels / vertices)
+       │
+       │ Upload vers GPU via driver / API
+       ▼
+[GPU Buffer en VRAM]
+  - Vertex Buffer (positions, indices)
+  - Image / Texture Buffer (pixels / textures)
+       │
+       │ GPU lit le buffer pour le rendu
+       ▼
+[Vertex Shader]
+  - Transforme chaque vertex en coordonnées écran
+  - Calcul couleur, coordonnées textures…
+       │
+       ▼
+[Rasterization]
+  - Transforme triangles en fragments (pixels)
+       │
+       ▼
+[Fragment Shader]
+  - Calcule couleur finale de chaque fragment
+  - Applique effets, textures, lumière
+       │
+       ▼
+[Blending / Combiner]
+  - Mélange couleur du nouveau pixel avec couleur existante dans le framebuffer
+       │
+       ▼
+[Back Buffer (VRAM)]
+  - Zone mémoire où GPU prépare image finale
+       │
+       │ Swap chain
+       ▼
+[Front Buffer (VRAM)]
+  - Zone mémoire affichée à l’écran
+       │
+       ▼
+[Écran]
+  - Affiche les pixels du front buffer à l’utilisateur

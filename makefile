@@ -14,7 +14,7 @@ mongoi = -I C:/mongo-cxx-driver/include \
 
 mongol = -L C:/mongo-cxx-driver/lib -lmongocxx -lbsoncxx -lWs2_32 -lcrypt32 -lBcrypt -lSecur32
 
-s:
+all:
 	g++ $(otherf) $(header) $(mongoi) $(libdir) $(lib) $(mongol) -mwindows -o sdl2/bin/myapp.exe
 
 os:

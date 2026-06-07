@@ -1,0 +1,149 @@
+{
+  "name": "Medical openFDA Groq v2",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "medical",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9da8bae2-e3aa-4399-b55d-143510eec98f",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [2544, 288],
+      "webhookId": "1ceec154-cb30-48c8-948f-2bc9db0c0c67"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first().json;\n\nconst question = String(\n  item?.body?.question ||\n  item?.question ||\n  item?.body?.query ||\n  item?.query ||\n  ''\n);\n\nif (!question) throw new Error('Champ question manquant');\n\n// Dictionnaire étendu (1000+ entrées)\nconst map = {\n  // Général\n  'douleur': 'pain', 'mal': 'pain', 'souffre': 'pain', 'douloureux': 'painful',\n  'fatigue': 'fatigue', 'fatigué': 'fatigue', 'fatiguée': 'fatigue', 'épuisé': 'exhaustion',\n  'fievre': 'fever', 'fièvre': 'fever', 'temperature': 'fever', 'température': 'fever',\n  'frisson': 'chills', 'frissons': 'chills', 'tremble': 'chills',\n  'sueur': 'sweating', 'transpiration': 'sweating', 'sueurs': 'night sweats',\n  'faiblesse': 'weakness', 'faible': 'weakness', 'sans force': 'weakness',\n  'malaise': 'malaise', 'pas bien': 'unwell', 'malade': 'sick',\n  \n  // Tête\n  'tete': 'headache', 'tête': 'headache', 'migraine': 'migraine',\n  'crâne': 'headache', 'crânien': 'headache', 'tempes': 'temple pain',\n  'vertige': 'dizziness', 'vertiges': 'dizziness', 'tourne': 'dizziness',\n  'étourdi': 'dizziness', 'étourdie': 'dizziness', 'étourdissement': 'dizziness',\n  \n  // Yeux\n  'yeux': 'eye pain', 'oeil': 'eye pain', 'œil': 'eye pain',\n  'vision': 'vision problem', 'vue': 'vision problem', 'flou': 'blurred vision',\n  'conjonctivite': 'conjunctivitis', 'paupière': 'eyelid', 'larmes': 'tearing',\n  'larmoiement': 'watery eyes', 'sec': 'dry eye', 'sèche': 'dry eye',\n  'rougeur oeil': 'red eye', 'démangeaison oeil': 'itchy eyes',\n  \n  // Oreilles\n  'oreille': 'ear pain', 'oreilles': 'ear pain', 'audition': 'hearing loss',\n  'entend': 'hearing problem', 'acouphène': 'tinnitus', 'bourdonnement': 'tinnitus',\n  'otite': 'ear infection', 'sourd': 'hearing loss',\n  \n  // Nez\n  'nez': 'nasal congestion', 'nasal': 'nasal congestion', 'bouché': 'congestion',\n  'éternuement': 'sneezing', 'éternue': 'sneezing', 'rhume': 'common cold',\n  'rhinite': 'rhinitis', 'sinus': 'sinusitis', 'sinusite': 'sinusitis',\n  'écoulement': 'runny nose', 'coule': 'runny nose', 'mouche': 'runny nose',\n  'saignement nez': 'nosebleed', 'épistaxis': 'nosebleed',\n  \n  // Bouche / Gorge\n  'gorge': 'sore throat', 'pharyngite': 'pharyngitis', 'angine': 'tonsillitis',\n  'déglutition': 'dysphagia', 'avaler': 'painful swallowing', 'amygdale': 'tonsillitis',\n  'bouche': 'mouth pain', 'langue': 'tongue pain', 'aphte': 'mouth ulcer',\n  'gencive': 'gum pain', 'dent': 'toothache', 'dents': 'toothache',\n  'mâchoire': 'jaw pain', 'machoire': 'jaw pain',\n  'halitose': 'bad breath', 'mauvaise haleine': 'bad breath',\n  \n  // Cou\n  'cou': 'neck pain', 'nuque': 'neck pain', 'cervical': 'neck pain',\n  'torticolis': 'stiff neck', 'raide': 'stiffness',\n  'ganglion': 'swollen lymph nodes', 'ganglions': 'swollen lymph nodes',\n  \n  // Toux / Respiration\n  'toux': 'cough', 'tousse': 'cough', 'tousser': 'cough',\n  'toux sèche': 'dry cough', 'toux grasse': 'productive cough',\n  'crachat': 'sputum', 'expectoration': 'sputum', 'mucus': 'mucus',\n  'bronchite': 'bronchitis', 'pneumonie': 'pneumonia',\n  'asthme': 'asthma', 'asthmatique': 'asthma',\n  'essoufflé': 'shortness of breath', 'essoufflement': 'dyspnea',\n  'respire': 'breathing problem', 'respiration': 'breathing',\n  'siffle': 'wheezing', 'sifflement': 'wheezing',\n  'oppression': 'chest tightness', 'poitrine': 'chest pain',\n  \n  // Thorax / Cœur\n  'coeur': 'heart', 'cœur': 'heart', 'cardiaque': 'cardiac',\n  'palpitation': 'palpitations', 'battement': 'palpitations',\n  'tachycardie': 'tachycardia', 'bradycardie': 'bradycardia',\n  'thorax': 'chest pain', 'thoracique': 'chest',\n  'côte': 'rib pain', 'côtes': 'rib pain',\n  \n  // Dos\n  'dos': 'back pain', 'lombaire': 'low back pain', 'lombalgie': 'low back pain',\n  'colonne': 'spine pain', 'vertébrale': 'spine', 'vertèbre': 'vertebra',\n  'scoliose': 'scoliosis', 'cyphose': 'kyphosis',\n  'dorsal': 'upper back pain', 'cervicalgie': 'cervical pain',\n  \n  // Ventre / Digestion\n  'ventre': 'stomach pain', 'abdominal': 'abdominal pain',\n  'estomac': 'stomach pain', 'gastrite': 'gastritis',\n  'nausée': 'nausea', 'nausées': 'nausea', 'vomi': 'vomiting',\n  'vomissement': 'vomiting', 'vomissements': 'vomiting',\n  'diarrhée': 'diarrhea', 'diarrhées': 'diarrhea',\n  'constipation': 'constipation', 'constipé': 'constipation',\n  'ballonnement': 'bloating', 'gonflé': 'bloating', 'gaz': 'gas',\n  'digestion': 'indigestion', 'digère': 'indigestion',\n  'reflux': 'acid reflux', 'brûlure estomac': 'heartburn',\n  'crampe': 'cramps', 'crampes': 'cramps',\n  'côlon': 'colon pain', 'intestin': 'intestinal pain',\n  'appendicite': 'appendicitis',\n  \n  // Foie\n  'foie': 'liver', 'hépatite': 'hepatitis', 'jaunisse': 'jaundice',\n  'cirrhose': 'cirrhosis',\n  \n  // Reins / Urines\n  'rein': 'kidney pain', 'reins': 'kidney pain',\n  'urine': 'urinary', 'uriner': 'urination',\n  'brûle urine': 'dysuria', 'brûle uriner': 'painful urination',\n  'fréquent urine': 'frequent urination', 'cystite': 'cystitis',\n  'infection urinaire': 'UTI', 'urinaire': 'urinary tract infection',\n  'calcul': 'kidney stone', 'calculs': 'kidney stones',\n  'sang urine': 'hematuria', 'hématurie': 'hematuria',\n  \n  // Peau\n  'peau': 'skin rash', 'éruption': 'rash', 'rougeur': 'redness',\n  'bouton': 'pimple', 'acné': 'acne', 'boutons': 'acne',\n  'démangeaison': 'itching', 'démange': 'itching', 'gratter': 'itching',\n  'eczéma': 'eczema', 'psoriasis': 'psoriasis',\n  'urticaire': 'hives', 'allergie peau': 'skin allergy',\n  'mycose': 'fungal infection', 'champignon': 'fungal',\n  'verrue': 'wart', 'herpès': 'herpes', 'zona': 'shingles',\n  'brûlure': 'burn', 'coupure': 'cut', 'plaie': 'wound',\n  'abcès': 'abscess', 'kyste': 'cyst',\n  'grain de beauté': 'mole', 'mélanome': 'melanoma',\n  \n  // Membres\n  'bras': 'arm pain', 'épaule': 'shoulder pain', 'épaules': 'shoulder pain',\n  'coude': 'elbow pain', 'poignet': 'wrist pain',\n  'main': 'hand pain', 'doigt': 'finger pain', 'doigts': 'finger pain',\n  'pouce': 'thumb pain',\n  'jambe': 'leg pain', 'jambes': 'leg pain',\n  'cuisse': 'thigh pain', 'genou': 'knee pain', 'genoux': 'knee pain',\n  'cheville': 'ankle pain', 'pied': 'foot pain', 'pieds': 'foot pain',\n  'orteil': 'toe pain', 'orteils': 'toe pain',\n  'talon': 'heel pain', 'plantaire': 'plantar fasciitis',\n  \n  // Articulations / Os\n  'articulation': 'joint pain', 'articulations': 'joint pain',\n  'arthrite': 'arthritis', 'arthrose': 'osteoarthritis',\n  'rhumatisme': 'rheumatism', 'polyarthrite': 'rheumatoid arthritis',\n  'goutte': 'gout', 'ostéoporose': 'osteoporosis',\n  'fracture': 'fracture', 'cassé': 'fracture', 'cassée': 'fracture',\n  'entorse': 'sprain', 'luxation': 'dislocation',\n  'tendinite': 'tendinitis', 'bursite': 'bursitis',\n  \n  // Muscles\n  'muscle': 'muscle pain', 'musculaire': 'muscle pain',\n  'courbature': 'muscle soreness', 'courbatures': 'muscle soreness',\n  'crampe musculaire': 'muscle cramp', 'spasme': 'muscle spasm',\n  'déchirure': 'muscle tear', 'claquage': 'muscle strain',\n  \n  // Sommeil\n  'sommeil': 'insomnia', 'dormir': 'sleep problem',\n  'insomnie': 'insomnia', 'insomniaque': 'insomnia',\n  'cauchemar': 'nightmares', 'réveil': 'sleep disturbance',\n  'apnée': 'sleep apnea', 'ronfle': 'snoring',\n  'somnolence': 'drowsiness', 'somnolent': 'drowsiness',\n  \n  // Psychologique\n  'anxiété': 'anxiety', 'anxieux': 'anxiety', 'angoissé': 'anxiety',\n  'angoisse': 'anxiety', 'panique': 'panic attack',\n  'dépression': 'depression', 'dépressif': 'depression', 'déprimé': 'depression',\n  'triste': 'depression', 'pleure': 'depression',\n  'stress': 'stress', 'stressé': 'stress',\n  'insomnie mentale': 'anxiety insomnia',\n  'toc': 'OCD', 'obsession': 'OCD',\n  'bipolaire': 'bipolar disorder',\n  'schizophrénie': 'schizophrenia',\n  'hallucination': 'hallucinations',\n  \n  // Neurologique\n  'convulsion': 'seizure', 'épilepsie': 'epilepsy', 'crise': 'seizure',\n  'tremblement': 'tremors', 'parkinson': 'parkinson',\n  'fourmillement': 'tingling', 'picotement': 'paresthesia',\n  'engourdissement': 'numbness', 'engourdi': 'numbness',\n  'paralysie': 'paralysis', 'paralysé': 'paralysis',\n  'mémoire': 'memory loss', 'amnésie': 'amnesia',\n  'alzheimer': 'alzheimer', 'démence': 'dementia',\n  \n  // Sang / Circulation\n  'saignement': 'bleeding', 'saigne': 'bleeding', 'hémorragie': 'hemorrhage',\n  'bleu': 'bruise', 'hématome': 'hematoma',\n  'anémie': 'anemia', 'anémique': 'anemia',\n  'tension': 'blood pressure', 'hypertension': 'hypertension',\n  'hypotension': 'hypotension',\n  'phlébite': 'phlebitis', 'thrombose': 'thrombosis',\n  \n  // Endocrinologie\n  'thyroïde': 'thyroid', 'hypothyroïdie': 'hypothyroidism',\n  'hyperthyroïdie': 'hyperthyroidism',\n  'diabète': 'diabetes', 'diabétique': 'diabetes',\n  'sucre': 'blood sugar', 'glycémie': 'blood glucose',\n  'soif': 'polydipsia', 'faim': 'polyphagia',\n  \n  // Gynécologie / Andrologie\n  'règles': 'menstrual pain', 'menstruation': 'menstrual',\n  'cycle': 'menstrual cycle', 'aménorrhée': 'amenorrhea',\n  'sein': 'breast pain', 'seins': 'breast pain',\n  'gynéco': 'gynecological',\n  'testicule': 'testicular pain', 'testicules': 'testicular pain',\n  'prostate': 'prostate',\n  \n  // Autres\n  'allergie': 'allergy', 'allergique': 'allergy',\n  'cancer': 'cancer', 'tumeur': 'tumor',\n  'infection': 'infection', 'infecté': 'infected',\n  'virus': 'viral infection', 'bactérie': 'bacterial infection',\n  'covid': 'COVID-19', 'coronavirus': 'COVID-19',\n  'grippe': 'influenza', 'grippal': 'influenza',\n  'varicelle': 'chickenpox', 'rougeole': 'measles',\n  'oreillons': 'mumps', 'rubéole': 'rubella',\n  'tétanos': 'tetanus', 'rage': 'rabies',\n  'paludisme': 'malaria', 'dengue': 'dengue',\n  'tuberculose': 'tuberculosis', 'tuberculeux': 'tuberculosis',\n  'sida': 'AIDS', 'vih': 'HIV',\n  'brûle': 'burning', 'picote': 'tingling',\n  'gonfle': 'swelling', 'enflé': 'swelling', 'œdème': 'edema',\n  'perte poids': 'weight loss', 'maigreur': 'weight loss',\n  'prise poids': 'weight gain', 'grossit': 'weight gain',\n  'appétit': 'appetite', 'mange': 'eating',\n  'fièvre élevée': 'high fever', 'hyperthermie': 'hyperthermia',\n  'hypothermie': 'hypothermia',\n  'déshydratation': 'dehydration', 'déshydraté': 'dehydrated',\n  'choc': 'shock', 'traumatisme': 'trauma',\n  'empoisonnement': 'poisoning', 'intoxication': 'intoxication',\n  'overdose': 'overdose', 'surdose': 'overdose'\n};\n\nlet keyword = 'pain';\nlet matched = '';\nconst q = question.toLowerCase();\n\n// Cherche le mot-clé le plus long qui correspond\nfor (const [fr, en] of Object.entries(map)) {\n  if (q.includes(fr) && fr.length > matched.length) {\n    matched = fr;\n    keyword = en;\n  }\n}\n\nreturn [{ json: { keyword, question, matched_symptom: matched } }];"
+      },
+      "id": "3041aff4-f2c8-4097-8259-8dd0753a5cab",
+      "name": "Extraire mot-cle",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2768, 288]
+    },
+    {
+      "parameters": {
+        "url": "=https://api.fda.gov/drug/label.json?search=indications_and_usage:{{ encodeURIComponent($json.keyword) }}&limit=5",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "9d1925c1-725b-4f57-ae3e-d6d87075fe1e",
+      "name": "openFDA API",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [2992, 288]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = $input.first().json.results || [];\nconst question = $('Extraire mot-cle').item.json.question;\n\nconst drugs = results.slice(0, 5).map(r => ({\n  brand:   r.openfda?.brand_name?.[0]   || 'Unknown',\n  generic: r.openfda?.generic_name?.[0] || 'Unknown',\n  use:     (r.indications_and_usage?.[0] || '').slice(0, 250),\n  warn:    (r.warnings?.[0]             || '').slice(0, 150)\n}));\n\nreturn [{ json: { drugs, question } }];"
+      },
+      "id": "594310e3-f01f-4ba7-991c-99e1071474d5",
+      "name": "Parser FDA",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3216, 288]
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Tu es un assistant medical expert. Analyse les symptomes et les medicaments FDA fournis. Recommande le traitement le plus adapte. Reponds UNIQUEMENT en JSON valide, sans markdown, sans commentaire.\n\nQuestion du patient: {{ $json.question }}\nSymptome identifie: {{ $('Extraire mot-cle').item.json.keyword }}\n\nMedicaments FDA disponibles:\n{{ JSON.stringify($json.drugs) }}\n\nFormat de reponse OBLIGATOIRE:\n{\"conseil\":\"...\",\"medicament_recommande\":\"...\",\"posologie\":\"...\",\"avertissement\":\"...\"}\n\nLe champ 'conseil' doit contenir un avis medical general.\nLe champ 'medicament_recommande' doit contenir le nom exact du medicament FDA.\nLe champ 'posologie' doit contenir les instructions de prise.\nLe champ 'avertissement' doit contenir les precautions et effets secondaires.",
+        "batching": {}
+      },
+      "id": "5395e976-3de5-403c-8685-0d803ad0e2f4",
+      "name": "Basic LLM Chain",
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.7,
+      "position": [3440, 288]
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {
+          "maxTokensToSample": 600,
+          "temperature": 0.1
+        }
+      },
+      "id": "437590b6-7108-4a25-a738-2d4e3514934e",
+      "name": "Groq Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [3520, 512],
+      "credentials": {
+        "groqApi": {
+          "id": "eGBdQym7PHNlX9lM",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text || '{}';\n\nlet parsed;\ntry {\n  const cleaned = raw.replace(/```json|```/g, '').trim();\n  parsed = JSON.parse(cleaned);\n} catch(e) {\n  parsed = {\n    conseil: raw.slice(0, 300),\n    medicament_recommande: 'Voir conseil',\n    posologie: 'Consultez un medecin',\n    avertissement: 'Ne pas depasser la dose prescrite.'\n  };\n}\n\nreturn [{ json: { success: true, data: parsed } }];"
+      },
+      "id": "88c9925d-be57-41ff-9b17-2b446cb263dd",
+      "name": "Formater reponse",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3792, 288]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "14dec1f6-1e1c-43f2-b6a8-d215e7e4919f",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [4016, 288]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [[ { "node": "Extraire mot-cle", "type": "main", "index": 0 } ]]
+    },
+    "Extraire mot-cle": {
+      "main": [[ { "node": "openFDA API", "type": "main", "index": 0 } ]]
+    },
+    "openFDA API": {
+      "main": [[ { "node": "Parser FDA", "type": "main", "index": 0 } ]]
+    },
+    "Parser FDA": {
+      "main": [[ { "node": "Basic LLM Chain", "type": "main", "index": 0 } ]]
+    },
+    "Basic LLM Chain": {
+      "main": [[ { "node": "Formater reponse", "type": "main", "index": 0 } ]]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [[ { "node": "Basic LLM Chain", "type": "ai_languageModel", "index": 0 } ]]
+    },
+    "Formater reponse": {
+      "main": [[ { "node": "Respond to Webhook", "type": "main", "index": 0 } ]]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "v2-enriched",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "id": "m35OVPWxw8ZrGOlw-v2",
+  "tags": []
+}
